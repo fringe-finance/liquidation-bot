@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as LiquidatePositions from '@fringefinance/primary-scripts';
+import * as LiquidatePositions from 'primary-scripts';
 import { LiquidationPosition } from './dto/liquidate-position.dto';
 import { ConfigService } from '@nestjs/config';
 
@@ -13,6 +13,10 @@ export class FringeService {
             this.configService.get('PIT_CONTRACT_ADDRESS'),
             this.configService.get('PIT_LIQUIDATION_CONTRACT_ADDRESS'),
             this.configService.get('PIT_SUBGRAPH_URL'),
+            this.configService.get('PRICE_AGGREGATOR_CONTRACT_ADDRESS'),
+            this.configService.get('PYTH_PRICE_PROVIDER_CONTRACT_ADDRESS'),
+            this.configService.get('TIME_BEFORE_EXPIRATION'),
+            this.configService.get('PYTHNET_PRICE_FEED_ENDPOINT')
         );
     }
 

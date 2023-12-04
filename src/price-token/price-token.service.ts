@@ -44,26 +44,34 @@ export class PriceTokenService {
 
     async getNativeCoinPrice(chainId: number) {
         const nativeCoinId = this.configService.get(
-            `COIN_GECKO_NATIVE_COIN_ID`,
+            `COIN_MARKETCAP_NATIVE_COIN_ID`,
         );
+        const convert_id = this.configService.get('COIN_MARKETCAP_CONVERT_ID');
         const price = await this.cacheManager.get(`NativeCoinPrice-${chainId}`);
         if (price) return price;
         try {
             const requestConfig = {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CMC_PRO_API_KEY': this.configService.get('COIN_MARKETCAP_API_KEY')
                 },
+                params: {
+                    id: nativeCoinId,
+                    convert_id
+                }
             };
-            const url = `https://api.coingecko.com/api/v3/simple/price?ids=${nativeCoinId}&vs_currencies=usd`;
+            const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest`;
+
             const response = await this.httpService.axiosRef.get(
                 url,
                 requestConfig,
             );
+            
             await this.cacheManager.set(
                 `NativeCoinPrice-${chainId}`,
-                response.data[nativeCoinId].usd,
+                response.data.data[nativeCoinId].quote[convert_id].price,
             );
-            return response && response.data[nativeCoinId].usd;
+            return response && response.data.data[nativeCoinId].quote[convert_id].price;
         } catch {
             throw new Error(`Error when get price ${nativeCoinId}`);
         }

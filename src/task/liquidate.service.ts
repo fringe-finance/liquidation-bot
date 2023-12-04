@@ -12,6 +12,7 @@ import { LiquidationBotContractService } from 'src/contract/liquidation-bot-cont
 import { LogService } from 'src/log/log.service';
 import { PriceTokenService } from 'src/price-token/price-token.service';
 import { ERC20ContractService } from 'src/contract/erc20.service';
+import { PriceAggregatorService } from 'src/contract/price-aggregator.service';
 
 @Injectable()
 export class LiquidateService {
@@ -25,6 +26,7 @@ export class LiquidateService {
         private readonly gasPriceService: GasPriceService,
         private readonly tokenPriceService: PriceTokenService,
         private readonly erc20Service: ERC20ContractService,
+        private readonly priceAggregatorService: PriceAggregatorService
     ) {
         const networkId = this.configService.get('NETWORK_ID');
         this.chainNetworkId = Number(networkId);
@@ -41,8 +43,9 @@ export class LiquidateService {
     async handleCron() {
         const chainNetworkId = this.chainNetworkId;
         this.logService.log(`Start liquidate on network ${chainNetworkId}`);
-
+        
         const fringe = await this.fringeService.getLiquidatePositions();
+
         if (!fringe || fringe.liquidatablePositions.length == 0)
             this.logService.log('There is no liquidatable position!', fringe);
 
@@ -69,7 +72,17 @@ export class LiquidateService {
         const minLA = BigInt(liquidatablePosition.minRepaymentTokenCount);
         let amount1 = lendingAmount < minLA ? minLA : lendingAmount;
         amount1 = amount1 > maxLA ? maxLA : amount1;
-
+        
+        const updatePriceData = await this.priceAggregatorService.getUpdatePriceData(
+            chainNetworkId,
+            this.configService.get(
+                `PRICE_AGGREGATOR_CONTRACT_ADDRESS`,
+            ),
+            [
+                liquidatablePosition.collateralTokenAddress,
+                liquidatablePosition.lendingTokenAddress
+            ]
+        );
         const flashParam: FlashSwapParams = {
             token0: liquidatablePosition.collateralTokenAddress,
             token1: liquidatablePosition.lendingTokenAddress,
@@ -79,8 +92,12 @@ export class LiquidateService {
                 borrower: liquidatablePosition.borrowerAddress,
                 collateralToken: liquidatablePosition.collateralTokenAddress,
                 lendingToken: liquidatablePosition.lendingTokenAddress,
+                priceIds: updatePriceData.priceIds,
+                updateData: updatePriceData.updateData,
+                updateFee: BigInt(updatePriceData.updateFee)
             },
         };
+        
         const { gasPrice, gasLimit } = await this.estimateTransactionFee(
             chainNetworkId,
             liquidationBotContractAddress,

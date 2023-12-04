@@ -1,324 +1,423 @@
 [
-    {
-        "inputs": [
-            {
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_uniswapFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_plp",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_plpLiquidation",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "liquidator",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "token0",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token1",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount0",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount1",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
                 "internalType": "address",
-                "name": "_uniswapFactory",
+                "name": "borrower",
                 "type": "address"
-            },
-            {
+              },
+              {
                 "internalType": "address",
-                "name": "_pit",
+                "name": "collateralToken",
                 "type": "address"
-            },
-            {
+              },
+              {
                 "internalType": "address",
-                "name": "_pitLiquidation",
+                "name": "lendingToken",
                 "type": "address"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "oldPIT",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newPIT",
-                "type": "address"
-            }
-        ],
-        "name": "OnSetPit",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "oldPITLiquidation",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newPITLiquidation",
-                "type": "address"
-            }
-        ],
-        "name": "OnSetPitLiquidation",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "oldFactory",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "newFactory",
-                "type": "address"
-            }
-        ],
-        "name": "OnSetUniswapFactory",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
+              },
+              {
+                "internalType": "bytes32[]",
+                "name": "priceIds",
+                "type": "bytes32[]"
+              },
+              {
+                "internalType": "bytes[]",
+                "name": "updateData",
+                "type": "bytes[]"
+              },
+              {
                 "internalType": "uint256",
-                "name": "amountOut",
+                "name": "updateFee",
                 "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "reserveIn",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "reserveOut",
-                "type": "uint256"
-            }
+              }
+            ],
+            "internalType": "struct PairFlash.LiquidateParams",
+            "name": "liquidateParam",
+            "type": "tuple"
+          }
         ],
-        "name": "getAmountIn",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
+        "indexed": false,
+        "internalType": "struct PairFlash.FlashParams",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "profitAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "OnFlash",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldPLP",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newPLP",
+        "type": "address"
+      }
+    ],
+    "name": "OnSetPlp",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldPLPLiquidation",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newPLPLiquidation",
+        "type": "address"
+      }
+    ],
+    "name": "OnSetPlpLiquidation",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldFactory",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newFactory",
+        "type": "address"
+      }
+    ],
+    "name": "OnSetUniswapFactory",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reserveIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reserveOut",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAmountIn",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "lending",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAmountRequired",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "token0",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "token1",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount0",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount1",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
                 "internalType": "address",
-                "name": "pair",
+                "name": "borrower",
                 "type": "address"
-            },
-            {
+              },
+              {
                 "internalType": "address",
-                "name": "lending",
+                "name": "collateralToken",
                 "type": "address"
-            },
-            {
+              },
+              {
+                "internalType": "address",
+                "name": "lendingToken",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes32[]",
+                "name": "priceIds",
+                "type": "bytes32[]"
+              },
+              {
+                "internalType": "bytes[]",
+                "name": "updateData",
+                "type": "bytes[]"
+              },
+              {
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "updateFee",
                 "type": "uint256"
-            }
+              }
+            ],
+            "internalType": "struct PairFlash.LiquidateParams",
+            "name": "liquidateParam",
+            "type": "tuple"
+          }
         ],
-        "name": "getAmountRequired",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "token0",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "token1",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount0",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount1",
-                        "type": "uint256"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "address",
-                                "name": "borrower",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "collateralToken",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "lendingToken",
-                                "type": "address"
-                            }
-                        ],
-                        "internalType": "struct PairFlash.LiquidateParams",
-                        "name": "liquidateParam",
-                        "type": "tuple"
-                    }
-                ],
-                "internalType": "struct PairFlash.FlashParams",
-                "name": "params",
-                "type": "tuple"
-            }
-        ],
-        "name": "initFlash",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "amountProfit",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "pit",
-        "outputs": [
-            {
-                "internalType": "contract IPrimaryIndexToken",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "pitLiquidation",
-        "outputs": [
-            {
-                "internalType": "contract IPrimaryIndexTokenLiquidation",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "newPit",
-                "type": "address"
-            }
-        ],
-        "name": "setPit",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "newLiquidation",
-                "type": "address"
-            }
-        ],
-        "name": "setPitLiquidation",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "newFactory",
-                "type": "address"
-            }
-        ],
-        "name": "setUniswapFactory",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "uniswapFactory",
-        "outputs": [
-            {
-                "internalType": "contract IUniswapV2Factory",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount0",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount1",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "uniswapV2Call",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "stateMutability": "payable",
-        "type": "receive"
-    }
+        "internalType": "struct PairFlash.FlashParams",
+        "name": "params",
+        "type": "tuple"
+      }
+    ],
+    "name": "initFlash",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountProfit",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "plp",
+    "outputs": [
+      {
+        "internalType": "contract IPrimaryLendingPlatform",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "plpLiquidation",
+    "outputs": [
+      {
+        "internalType": "contract IPrimaryLendingPlatformLiquidation",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newPlp",
+        "type": "address"
+      }
+    ],
+    "name": "setPlp",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newLiquidation",
+        "type": "address"
+      }
+    ],
+    "name": "setPlpLiquidation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newFactory",
+        "type": "address"
+      }
+    ],
+    "name": "setUniswapFactory",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "uniswapFactory",
+    "outputs": [
+      {
+        "internalType": "contract IUniswapV2Factory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "uniswapV2Call",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  }
 ]

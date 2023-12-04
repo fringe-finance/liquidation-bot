@@ -31,9 +31,9 @@ export class LiquidationBotContractService extends BaseContractService {
                 return;
             }
             const tuple = this._getInitFlashInput(params);
-            // console.log('tupple ', tuple);
+            
             const gas = await liquidationBotContract.initFlash.estimateGas(
-                tuple,
+                tuple, { value: params.liquidateParam.updateFee }
             );
             if (!gas || Number(gas) == 0) {
                 this.logService.error('Estimate gas fail!');
@@ -64,6 +64,7 @@ export class LiquidationBotContractService extends BaseContractService {
             const tx = await liquidationBotContract.initFlash(tuple, {
                 gasLimit,
                 gasPrice,
+                value: params.liquidateParam.updateFee
             });
             return tx.wait(1);
         } catch (e) {
@@ -113,6 +114,9 @@ export class LiquidationBotContractService extends BaseContractService {
                 params.liquidateParam.borrower,
                 params.liquidateParam.collateralToken,
                 params.liquidateParam.lendingToken,
+                params.liquidateParam.priceIds,
+                params.liquidateParam.updateData,
+                params.liquidateParam.updateFee
             ],
         ];
         return tuple;

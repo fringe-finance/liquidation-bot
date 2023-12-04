@@ -20,7 +20,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@fringefinance/primary-scripts": "^1.0.3",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/common": "^9.0.0",
@@ -28,9 +27,11 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/schedule": "^2.2.1",
+    "@pythnetwork/pyth-evm-js": "^1.29.2",
     "cache-manager": "^5.2.1",
     "ethers": "^6.3.0",
     "log4js": "^6.9.1",
+    "primary-scripts": "1.0.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },

@@ -5,11 +5,12 @@ import { ProviderModule } from 'src/provider/provider.module';
 import { ERC20ContractService } from './erc20.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PriceAggregatorService } from './price-aggregator.service';
 
 @Module({
     imports: [LogModule, ProviderModule],
     controllers: [],
-    providers: [LiquidationBotContractService, ERC20ContractService],
-    exports: [LiquidationBotContractService, ERC20ContractService],
+    providers: [LiquidationBotContractService, ERC20ContractService, PriceAggregatorService],
+    exports: [LiquidationBotContractService, ERC20ContractService, PriceAggregatorService],
 })
 export class ContractModule {}
