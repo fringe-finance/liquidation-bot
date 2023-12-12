@@ -64,6 +64,48 @@ Or run as background process with pm2:
 pm2 start dist/main --name liquidation-bot
   ```
 
+## Configuration for mainnet ⚙️
+
+### Ethereum mainnet
+  ```
+NETWORK_RPC='https://mainnet.infura.io/v3/'
+PIT_CONTRACT_ADDRESS=''
+PIT_LIQUIDATION_CONTRACT_ADDRESS=''
+PIT_SUBGRAPH_URL=''
+  ```
+
+### Arbitrum mainnet
+  ```
+NETWORK_RPC='https://arb1.arbitrum.io/rpc'
+PIT_CONTRACT_ADDRESS=’0x5855F919E89c5cb5e0052Cb09addEFF62EB9339A’     
+PIT_LIQUIDATION_CONTRACT_ADDRESS=’0x0438b74336E042BB596Be593cfF8D84FD0D8935B’
+PIT_SUBGRAPH_URL=’https://api.studio.thegraph.com/query/57877/fringe-plpv2-arb-mainnet2/version/latest'
+  ```
+
+### Polygon mainnet
+  ```
+NETWORK_RPC='https://polygon-mainnet.infura.io'
+PIT_CONTRACT_ADDRESS=’0x286475366f736fcEeB0480d7233ef169AE614Fe4’
+PIT_LIQUIDATION_CONTRACT_ADDRESS=’0x4cc524E21222Ec40E586f7C6da21a4F4DD2B1D2f’
+PIT_SUBGRAPH_URL='https://api.studio.thegraph.com/query/57877/fringe-plpv2-poly-mainnet/version/latest'
+  ```
+
+### Optimism mainnet
+  ```
+NETWORK_RPC='https://mainnet.optimism.io/'
+PIT_CONTRACT_ADDRESS=’0x088F23ac0c07A3Ce008FB88c4bacFF06FECC6158’
+PIT_LIQUIDATION_CONTRACT_ADDRESS=’0xfE56364C8157E7A459693FE481bB2d138949cB47’
+PIT_SUBGRAPH_URL='https://api.thegraph.com/subgraphs/name/brainspacer/fringe-plpv2-opt-mainnet2'
+  ```
+
+### zkSync Era mainnet
+  ```
+NETWORK_RPC='https://mainnet.era.zksync.io'
+PIT_CONTRACT_ADDRESS=’’
+PIT_LIQUIDATION_CONTRACT_ADDRESS=’’
+PIT_SUBGRAPH_URL=''
+  ```
+
 ## Configuration for development testnet ⚙️
 
 ### Ethereum Goerli
