@@ -69,9 +69,9 @@ pm2 start dist/main --name liquidation-bot
 ### Ethereum mainnet
   ```
 NETWORK_RPC='https://mainnet.infura.io/v3/'
-PIT_CONTRACT_ADDRESS=''   TBA
-PIT_LIQUIDATION_CONTRACT_ADDRESS=''   TBA
-PIT_SUBGRAPH_URL=''   TBA
+PIT_CONTRACT_ADDRESS='0x70467416507B75543C18093096BA4612a9261DB8'
+PIT_LIQUIDATION_CONTRACT_ADDRESS='0x747088fA37fB08d7F8326FBe119D5bf332d0F60d'
+PIT_SUBGRAPH_URL='https://api.studio.thegraph.com/query/57877/fringe-plpv2-eth-mainnet/version/latest'
   ```
 
 ### Arbitrum mainnet
@@ -101,9 +101,9 @@ PIT_SUBGRAPH_URL='https://api.thegraph.com/subgraphs/name/brainspacer/fringe-plp
 ### zkSync Era mainnet
   ```
 NETWORK_RPC='https://mainnet.era.zksync.io'
-PIT_CONTRACT_ADDRESS=’’   TBA
-PIT_LIQUIDATION_CONTRACT_ADDRESS=’’   TBA
-PIT_SUBGRAPH_URL=''   TBA
+PIT_CONTRACT_ADDRESS=’0x8f1d37769a56340542Fb399Cb1cA49d46Aa9fec8’
+PIT_LIQUIDATION_CONTRACT_ADDRESS=’0xe0dBcD250EDbF3638349C2d0cCA1a97A6B93a995’
+PIT_SUBGRAPH_URL='https://api.studio.thegraph.com/query/57877/fringe-plpv2-zk-mainnet/version/latest'
   ```
 
 ## Configuration for development testnet ⚙️
