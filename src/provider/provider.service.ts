@@ -46,7 +46,6 @@ export class ProvidersService {
             for (let i = 0; i < rpcList.length; i++) {
                 const provider = new ethers.JsonRpcProvider(rpcList[i]);
                 const { chainId } = await provider.getNetwork();
-                this.logService.log('Get provider!');
                 if (chainId) {
                     return provider;
                 }
@@ -62,7 +61,6 @@ export class ProvidersService {
         if (!signer) {
             this.logService.log("Can't get signer!");
         }
-        this.logService.log('Get signer!');
         return signer;
     }
 

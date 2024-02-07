@@ -67,6 +67,11 @@ Install dependencies:
 yarn install
   ```
 
+Build the project:
+  ```
+yarn build
+  ```
+
 Run liquidation bot in terminal:
   ```
 yarn start:prod
