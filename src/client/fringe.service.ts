@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as LiquidatePositions from 'primary-scripts';
+import * as LiquidatePositions from '@fringefinance/primary-scripts';
 import { LiquidationPosition } from './dto/liquidate-position.dto';
 import { ConfigService } from '@nestjs/config';
 

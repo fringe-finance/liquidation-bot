@@ -66,6 +66,7 @@ export class LiquidationBotContractService extends BaseContractService {
                 gasPrice,
                 value: params.liquidateParam.updateFee
             });
+            this.logService.log('Transaction hash: ', tx.hash);
             return tx.wait(1);
         } catch (e) {
             this.logService.error('Error when init flash loan: ', e);

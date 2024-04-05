@@ -3,8 +3,6 @@ import { LiquidationBotContractService } from './liquidation-bot-contract.servic
 import { LogModule } from 'src/log/log.module';
 import { ProviderModule } from 'src/provider/provider.module';
 import { ERC20ContractService } from './erc20.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PriceAggregatorService } from './price-aggregator.service';
 
 @Module({

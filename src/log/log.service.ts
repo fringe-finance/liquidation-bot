@@ -21,10 +21,10 @@ export class LogService {
         });
     }
 
-    log(message: any, ...args: any[]) {
-        const logger = log4js.getLogger();
+    log(message: any, ...args: any) {
+        const logger = log4js.getLogger("PLPv2");
         if (args.length > 0) {
-            logger.log(message, args);
+            logger.log("info", message, args);
             console.log(message, args);
         } else {
             logger.log(message);
@@ -32,10 +32,10 @@ export class LogService {
         }
     }
 
-    debug(message: any, ...args: any[]) {
-        const logger = log4js.getLogger();
+    debug(message: any, ...args: any) {
+        const logger = log4js.getLogger("PLPv2");
         if (args.length > 0) {
-            logger.debug(message, args);
+            logger.debug("debug", message, args);
             console.log(message, args);
         } else {
             logger.debug(message);
@@ -43,10 +43,10 @@ export class LogService {
         }
     }
 
-    error(message: any, ...args: any[]) {
-        const logger = log4js.getLogger();
+    error(message: any, ...args: any) {
+        const logger = log4js.getLogger("PLPv2");
         if (args.length > 0) {
-            logger.error(message, args);
+            logger.error("error",message, args);
             console.log(message, args);
         } else {
             logger.error(message);
