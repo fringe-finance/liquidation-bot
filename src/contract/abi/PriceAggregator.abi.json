@@ -144,6 +144,32 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "priceOracle",
+        "type": "address"
+      }
+    ],
+    "name": "SetPriceOracle",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newPrimaryLendingPlatform",
+        "type": "address"
+      }
+    ],
+    "name": "SetPrimaryLendingPlatform",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "newPythPriceProvider",
         "type": "address"
       }
@@ -236,70 +262,12 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "evaluation",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenAmount",
+        "name": "collateralEvaluation",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "priceMantissa",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "validTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
-      }
-    ],
-    "name": "getEvaluationSigned",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "evaluation",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "getEvaluationUnsafe",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "evaluation",
+        "name": "capitalEvaluation",
         "type": "uint256"
       }
     ],
@@ -341,19 +309,24 @@
         "internalType": "address",
         "name": "token",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenAmount",
+        "type": "uint256"
       }
     ],
-    "name": "getPrice",
+    "name": "getMostEvaluation",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "priceMantissa",
+        "name": "collateralEvaluation",
         "type": "uint256"
       },
       {
-        "internalType": "uint8",
-        "name": "priceDecimals",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "capitalEvaluation",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -365,34 +338,29 @@
         "internalType": "address",
         "name": "token",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "priceMantissa",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "validTo",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "signature",
-        "type": "bytes"
       }
     ],
-    "name": "getPriceSigned",
+    "name": "getPrice",
     "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "priceMantissa_",
-        "type": "uint256"
-      },
       {
         "internalType": "uint8",
         "name": "priceDecimals",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint64",
+        "name": "timestamp",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256",
+        "name": "collateralPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "capitalPrice",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -421,8 +389,42 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "projectToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "actualLendingToken",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "isBorrow",
+        "type": "bool"
+      }
+    ],
+    "name": "getTokensUpdateFinalPrices",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "token",
         "type": "address"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "priceIds",
+        "type": "bytes32[]"
       },
       {
         "internalType": "bytes[]",
@@ -433,14 +435,24 @@
     "name": "getUpdatedPrice",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "priceMantissa",
-        "type": "uint256"
-      },
-      {
         "internalType": "uint8",
         "name": "priceDecimals",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint64",
+        "name": "timestamp",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256",
+        "name": "collateralPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "capitalPrice",
+        "type": "uint256"
       }
     ],
     "stateMutability": "payable",
@@ -502,10 +514,42 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newPriceOracle",
+        "type": "address"
+      }
+    ],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "priceOracle",
+    "outputs": [
+      {
+        "internalType": "contract IPriceOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "primaryLendingPlatform",
+    "outputs": [
+      {
+        "internalType": "contract IPrimaryLendingPlatform",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -574,6 +618,32 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "newPriceOracle",
+        "type": "address"
+      }
+    ],
+    "name": "setPriceOracle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "plp",
+        "type": "address"
+      }
+    ],
+    "name": "setPrimaryLendingPlatform",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "newPythPriceProvider",
         "type": "address"
       }
@@ -594,11 +664,6 @@
         "internalType": "address",
         "name": "priceProvider",
         "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "hasFunctionWithSign",
-        "type": "bool"
       }
     ],
     "name": "setTokenAndPriceProvider",
@@ -637,16 +702,47 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "priceProvider",
+        "name": "",
         "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "hasSignedFunction",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "token",
+        "type": "address[]"
+      }
+    ],
+    "name": "updateMultiFinalPrices",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "token",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "priceIds",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes[]",
+        "name": "updateData",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "updateMultiFinalPricesWithUpdatePrice",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -665,19 +761,6 @@
     "name": "updatePrices",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "usdDecimals",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ]
