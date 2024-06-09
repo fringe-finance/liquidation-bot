@@ -5,6 +5,7 @@ import { ContractModule } from 'src/contract/contract.module';
 import { FringeModule } from 'src/client/fringe.module';
 import { GasPriceModule } from 'src/gas-price/gas-price.module';
 import { PriceTokenModule } from 'src/price-token/price-token.module';
+import { ExchangeAggregatorModule } from 'src/exchange-aggregator/exchange-aggregator.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { PriceTokenModule } from 'src/price-token/price-token.module';
         FringeModule,
         GasPriceModule,
         PriceTokenModule,
+        ExchangeAggregatorModule
     ],
     providers: [LiquidateService],
 })

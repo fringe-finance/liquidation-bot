@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ProvidersService } from '../provider/provider.service';
-import * as ERC20_ABI from './abi/IERC20.abi.json';
+import * as ERC20_ABI from './abi/ERC20.json';
 import { BaseContractService } from './base-contract.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';

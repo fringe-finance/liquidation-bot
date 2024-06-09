@@ -5,26 +5,34 @@ import { LiquidatablePosition } from 'src/client/dto/liquidate-position.dto';
 import { FringeService } from 'src/client/fringe.service';
 import { GasPriceService } from 'src/gas-price/gas-price.service';
 import { uint256ToNumber } from 'src/helper/common';
-import { FlashSwapParams } from 'src/contract/dto/flash-swap-param.dto';
-import { LiquidationBotContractService } from 'src/contract/liquidation-bot-contract.service';
+import { LiquidationContractService } from 'src/contract/liquidation.service';
 import { LogService } from 'src/log/log.service';
 import { PriceTokenService } from 'src/price-token/price-token.service';
-import { ERC20ContractService } from 'src/contract/erc20.service';
 import { PriceAggregatorService } from 'src/contract/price-aggregator.service';
+import {
+    LiquidateParams,
+    TokenType,
+} from 'src/contract/dto/liquidate-params.dto';
+import { ExchangeAggregatorService } from 'src/exchange-aggregator/exchange-aggregator.service';
+import { BigNumberish } from 'ethers';
+import { ExchangeType } from 'src/helper/enums/dex';
+import { UpdatePriceData } from 'src/contract/dto/update-price-data.dto';
 
 @Injectable()
 export class LiquidateService {
     private readonly chainNetworkId;
     private readonly enableCheckProfit;
+    private readonly usdDecimals = 10;
+
     constructor(
         private readonly configService: ConfigService,
         private readonly logService: LogService,
         private readonly fringeService: FringeService,
-        private readonly liquidationBotContractService: LiquidationBotContractService,
+        private readonly liquidationContractService: LiquidationContractService,
         private readonly gasPriceService: GasPriceService,
         private readonly tokenPriceService: PriceTokenService,
-        private readonly erc20Service: ERC20ContractService,
         private readonly priceAggregatorService: PriceAggregatorService,
+        private readonly exchangeAggregatorService: ExchangeAggregatorService,
     ) {
         const networkId = this.configService.get('NETWORK_ID');
         this.chainNetworkId = Number(networkId);
@@ -43,7 +51,11 @@ export class LiquidateService {
         this.logService.log(`Start liquidate on network ${chainNetworkId}`);
 
         const fringe = await this.fringeService.getLiquidatePositions();
-        if (!fringe || fringe.borrowers.length == 0 || fringe.liquidatablePositions.length == 0) {
+        if (
+            !fringe ||
+            fringe.borrowers.length == 0 ||
+            fringe.liquidatablePositions.length == 0
+        ) {
             this.logService.log('There is no liquidatable position!');
         } else {
             const { liquidatablePositions } = fringe;
@@ -53,7 +65,9 @@ export class LiquidateService {
             }
         }
         this.logService.log(`End liquidate on network ${chainNetworkId}`);
-        this.logService.log('--------------------------------------------------------------------------------------------------');
+        this.logService.log(
+            '--------------------------------------------------------------------------------------------------',
+        );
     }
 
     private async liquidate(
@@ -61,48 +75,52 @@ export class LiquidateService {
         liquidatablePosition: LiquidatablePosition,
     ) {
         try {
-            const liquidationBotContractAddress = this.configService.get(
-                `LIQUIDATION_BOT_ADDRESS`,
+            const liquidationContractAddress =
+                this.configService.get(`LIQUIDATION_ADDRESS`);
+            this.logService.log(
+                '----------------------------------------------',
             );
-            this.logService.log('----------------------------------------------');
-            this.logService.log('Liquidate for position: ', liquidatablePosition);
-            const lendingAmount = BigInt(
+            this.logService.log(
+                'Liquidate for position: ',
+                liquidatablePosition,
+            );
+            let totalDebt = BigInt(
                 liquidatablePosition.lendingTokenOutstandingCount,
             );
             const maxLA = BigInt(liquidatablePosition.maxRepaymentTokenCount);
             const minLA = BigInt(liquidatablePosition.minRepaymentTokenCount);
-            let amount1 = lendingAmount < minLA ? minLA : lendingAmount;
-            amount1 = amount1 > maxLA ? maxLA : amount1;
+            let lendingAmount = totalDebt < minLA ? minLA : totalDebt;
+            lendingAmount = lendingAmount > maxLA ? maxLA : lendingAmount;
 
-            const updatePriceData = await this.priceAggregatorService.getUpdatePriceData(
+            const updatePriceData =
+                await this.priceAggregatorService.getUpdatePriceData(
+                    chainNetworkId,
+                    this.configService.get(`PRICE_AGGREGATOR_CONTRACT_ADDRESS`),
+                    [
+                        ...liquidatablePosition.collateralToken
+                            .underlyingTokens,
+                        ...liquidatablePosition.lendingToken.underlyingTokens,
+                    ],
+                );
+
+            const exchangeType =
+                await this.liquidationContractService.getExchangeAggregatorType(
+                    chainNetworkId,
+                    liquidationContractAddress,
+                );
+
+            const liquidateParam = await this.getLiquidateParams(
+                liquidatablePosition,
+                lendingAmount,
+                updatePriceData,
+                exchangeType,
                 chainNetworkId,
-                this.configService.get(
-                    `PRICE_AGGREGATOR_CONTRACT_ADDRESS`,
-                ),
-                [
-                    liquidatablePosition.collateralTokenAddress,
-                    liquidatablePosition.lendingTokenAddress
-                ]
-            );
-            const flashParam: FlashSwapParams = {
-                token0: liquidatablePosition.collateralTokenAddress,
-                token1: liquidatablePosition.lendingTokenAddress,
-                amount0: BigInt(0),
-                amount1,
-                liquidateParam: {
-                    borrower: liquidatablePosition.borrowerAddress,
-                    collateralToken: liquidatablePosition.collateralTokenAddress,
-                    lendingToken: liquidatablePosition.lendingTokenAddress,
-                    priceIds: updatePriceData.priceIds,
-                    updateData: updatePriceData.updateData,
-                    updateFee: BigInt(updatePriceData.updateFee)
-                },
-            };
+            )
 
             const { gasPrice, gasLimit } = await this.estimateTransactionFee(
                 chainNetworkId,
-                liquidationBotContractAddress,
-                flashParam,
+                liquidationContractAddress,
+                liquidateParam,
             );
 
             const isHaveProfit =
@@ -110,21 +128,22 @@ export class LiquidateService {
                 gasLimit &&
                 (await this.isHaveProfit(
                     chainNetworkId,
-                    liquidationBotContractAddress,
-                    liquidatablePosition,
+                    liquidationContractAddress,
+                    liquidateParam,
                     gasPrice * gasLimit,
                 ));
 
             if (
-                (this.enableCheckProfit && isHaveProfit) ||
-                !this.enableCheckProfit
+                ((this.enableCheckProfit && isHaveProfit) ||
+                    !this.enableCheckProfit) &&
+                liquidateParam.buyCalldata !== undefined
             ) {
                 this.logService.log('Liquidate flashParam: ');
-                this.logService.log(flashParam);
-                await this.liquidationBotContractService.initFlash(
+                this.logService.log(liquidateParam);
+                await this.liquidationContractService.liquidate(
                     chainNetworkId,
-                    liquidationBotContractAddress,
-                    flashParam,
+                    liquidationContractAddress,
+                    liquidateParam,
                     gasLimit,
                     gasPrice,
                 );
@@ -137,10 +156,10 @@ export class LiquidateService {
     private async estimateTransactionFee(
         chainId: number,
         contractAddress: string,
-        params: FlashSwapParams,
+        params: LiquidateParams,
     ) {
         const gasPrice = await this.gasPriceService.getGasPrice();
-        const gasLimit = await this.liquidationBotContractService.estimateGas(
+        const gasLimit = await this.liquidationContractService.estimateGas(
             chainId,
             contractAddress,
             params,
@@ -153,78 +172,72 @@ export class LiquidateService {
         };
     }
 
+    private async getLiquidateParams(
+        liquidatablePosition: LiquidatablePosition, 
+        lendingAmount: BigNumberish, 
+        updatePriceData: UpdatePriceData, 
+        exchangeType: ExchangeType, 
+        chainNetworkId: number
+    ): Promise<LiquidateParams> {
+        const callData = await this.exchangeAggregatorService.estimate(
+            liquidatablePosition.collateralToken,
+            liquidatablePosition.lendingToken,
+            lendingAmount,
+            this.configService.get('PLP_LIQUIDATION_CONTRACT_ADDRESS'),
+            this.configService.get('MAX_DISCREPANCY'),
+            chainNetworkId,
+            exchangeType
+        );
+    
+        const liquidateParam: LiquidateParams = {
+            borrower: liquidatablePosition.borrowerAddress,
+            collateralInfo: {
+                addr: liquidatablePosition.collateralToken.address,
+                tokenType: TokenType[liquidatablePosition.collateralToken.tokenType as keyof typeof TokenType],
+            },
+            lendingInfo: {
+                addr: liquidatablePosition.lendingToken.address,
+                tokenType: TokenType[liquidatablePosition.lendingToken.tokenType as keyof typeof TokenType],
+            },
+            liquidationAmount: lendingAmount,
+            priceIds: updatePriceData.priceIds,
+            updateData: updatePriceData.updateData,
+            buyCalldata: callData?.buyCallData,
+            updateFee: BigInt(updatePriceData.updateFee),
+        };
+    
+        return liquidateParam;
+    }
+
     private async isHaveProfit(
         chainNetworkId: number,
-        liquidationBotContractAddress: string,
-        liquidatablePosition: LiquidatablePosition,
+        liquidationContractAddress: string,
+        liquidateParam: LiquidateParams,
         transactionFee: bigint,
     ) {
-        const {
-            collateralTokenAddress,
-            collateralTokenCount,
-            collateralTokenValue,
-            lendingTokenAddress,
-            maxRepaymentTokenCount,
-            lendingTokenOutstandingCount,
-            lendingTokenOutstandingValue,
-            liquidatorRewardFactor
-        } = liquidatablePosition;
-        const requiredCollateralAmount =
-            await this.liquidationBotContractService.getAmountCollateralRequired(
+        const estimatedCollateralReward =
+            await this.liquidationContractService.getEstimatedCollateralReward(
                 chainNetworkId,
-                liquidationBotContractAddress,
-                collateralTokenAddress,
-                lendingTokenAddress,
-                maxRepaymentTokenCount,
+                liquidationContractAddress,
+                this.configService.get(`PLP_CONTRACT_ADDRESS`),
+                liquidateParam,
             );
-        const collateralInfo = await this.erc20Service.tokenInfo(
-            chainNetworkId,
-            collateralTokenAddress,
-        );
-        const lendingInfo = await this.erc20Service.tokenInfo(
-            chainNetworkId,
-            lendingTokenAddress,
-        );
 
-        const lendingPrice = await this.tokenPriceService.getTokenPrice(
-            chainNetworkId,
-            lendingTokenAddress,
-            lendingInfo.decimals,
-            lendingInfo.symbol,
-            lendingTokenOutstandingValue,
-            lendingTokenOutstandingCount,
+        const profitInUSD = uint256ToNumber(
+            BigInt(estimatedCollateralReward),
+            this.usdDecimals,
         );
-        const collateralPrice = await this.tokenPriceService.getTokenPrice(
-            chainNetworkId,
-            collateralTokenAddress,
-            collateralInfo.decimals,
-            collateralInfo.symbol,
-            collateralTokenValue,
-            collateralTokenCount,
-        );
-
-        const collateralRewardAmount = Number(maxRepaymentTokenCount) * Number(lendingPrice) * Number(10 ** collateralInfo.decimals) / (Number(10 ** lendingInfo.decimals) * Number(collateralPrice));
-        const profitAmountInNumber = (BigInt(lendingTokenOutstandingCount) - BigInt(maxRepaymentTokenCount)) < BigInt(10) ?
-            uint256ToNumber(BigInt(Number(collateralTokenCount) - Number(requiredCollateralAmount)), collateralInfo.decimals)
-            :
-            uint256ToNumber(
-                BigInt(Math.round((Number(collateralRewardAmount) * Number(liquidatorRewardFactor)) - Number(requiredCollateralAmount))),
-                collateralInfo.decimals,
-            );
-        
-        const profitInUSD = collateralPrice * profitAmountInNumber;
 
         const nativePrice = await this.tokenPriceService.getNativeCoinPrice(
             chainNetworkId,
         );
         const transactionFeeInNumber = uint256ToNumber(transactionFee, 18);
         const transactionFeeInUSD = transactionFeeInNumber * nativePrice;
-        this.logService.log('profitAmount', profitAmountInNumber.toString());
-        this.logService.log('transactionFee', transactionFeeInNumber.toString());
-        this.logService.log('collateralPrice', collateralPrice.toString());
-        this.logService.log('nativePrice', nativePrice.toString());
-        this.logService.log('profitInUSD', profitInUSD.toString());
-        this.logService.log('transactionFeeInUSD', transactionFeeInUSD.toString());
+        this.logService.log('profitAmountInUSD', profitInUSD.toString());
+        this.logService.log(
+            'transactionFeeInUSD',
+            transactionFeeInUSD.toString(),
+        );
 
         if (profitInUSD > transactionFeeInUSD) return true;
         return false;

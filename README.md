@@ -18,7 +18,6 @@ Rename the `.env.example` file to `.env` and update the value of env variables :
 | `PLP_LIQUIDATION_CONTRACT_ADDRESS` | **REQUIRED** The address of the Primary Lending Platform Liquidation contract |
 | `PLP_SUBGRAPH_URL` | **REQUIRED** The Subgraph URL that returns Fringe liquidatable positions, needed to perform liquidations |
 | `LIQUIDATOR_PRIVATE_KEY` | **REQUIRED** Ethereum private key the Fringe account owner that will do the liquidations. Make sure that "0x" is at the start of it (MetaMask exports private keys without it) |
-| `LIQUIDATION_BOT_ADDRESS` | **REQUIRED** The address of the liquidation bot smart contract that perform liquidations on the Fringe Primary Lending contract |
 | `EXPLORER_SCAN_API_URL` | **REQUIRED** The API URL of the explorer scan to get gas price. Ex: `https://api-testnet.polygonscan.com/api` |
 | `EXPLORER_SCAN_API_KEY` | **REQUIRED** The API Key of the explorer scan to use `EXPLORER_SCAN_API_URL` |
 | `COIN_MARKETCAP_NATIVE_COIN_ID` | **REQUIRED** The identifier for the native coin on CoinMarketCap. This ID is essential for fetching data related to the native coin on CoinMarketCap. Ex: MATIC: `3890`|
@@ -44,7 +43,6 @@ PLP_LIQUIDATION_CONTRACT_ADDRESS=0xAd4dA77A7dCFA676F00fc328a927e2a6aa52C1bA
 PLP_SUBGRAPH_URL=https://api.studio.thegraph.com/query/37579/test-subgraph-liquidate-bot/version/latest
 
 LIQUIDATOR_PRIVATE_KEY=e5fdde82360d1b2274..................cea21d768565ed7440123
-LIQUIDATION_BOT_ADDRESS=0x2DaE912Ab1F6c20f3c0bCefeCc92E9c62BE3960B
 EXPLORER_SCAN_API_URL=https://api-testnet.polygonscan.com/api
 EXPLORER_SCAN_API_KEY=QZJV2VBK4C6XHK......VZCK4X25VR3
 COIN_MARKETCAP_NATIVE_COIN_ID=3890 # MATIC

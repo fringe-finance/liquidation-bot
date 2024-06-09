@@ -13,10 +13,10 @@ export interface Borrower {
 
 export interface LiquidatablePosition {
     borrowerAddress: string;
-    collateralTokenAddress: string;
+    collateralToken: TokenInfo;
     collateralTokenValue: string;
     collateralTokenCount: string;
-    lendingTokenAddress: string;
+    lendingToken: TokenInfo;
     lendingTokenOutstandingCount: string;
     lendingTokenOutstandingValue: string;
     healthFactor: number;
@@ -24,4 +24,10 @@ export interface LiquidatablePosition {
     maxRepaymentTokenCount: string;
     liquidatorRewardFactor: number;
     chainId: number;
+}
+
+export interface TokenInfo {
+    address: string;
+    tokenType: string;
+    underlyingTokens: string[];
 }
