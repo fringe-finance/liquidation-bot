@@ -51,6 +51,7 @@ export class ExchangeAggregatorService {
                 tokenDestAmount,
                 receiver,
                 chainId.toString(),
+                maxDiscrepancy,
             );
         } else if (swapOnDex === Dex.OpenOcean) {
             return await this.openOceanService.buyOnOpenOcean(
@@ -199,7 +200,7 @@ export class ExchangeAggregatorService {
             tokenTypeIn === AssetType.ERC20 &&
             tokenTypeOut === AssetType.ERC20
         ) {
-            return await this.estimateERC20ToERC20(
+            return await this.estimateBuyERC20FromERC20(
                 tokenIn,
                 tokenOut,
                 expectedAmountOut,
@@ -303,7 +304,7 @@ export class ExchangeAggregatorService {
         throw new Error("Haven't implemented yet");
     }
 
-    async estimateERC20ToERC20(
+    async estimateBuyERC20FromERC20(
         tokenIn: TokenInfo,
         tokenOut: TokenInfo,
         expectedAmountOut: BigNumberish,
@@ -312,18 +313,13 @@ export class ExchangeAggregatorService {
         chainId: number,
         dexType: Dex,
     ) {
-        const acceptableAmountOut = getMaxDiscrepancyAmount(
-            expectedAmountOut,
-            maxDiscrepancy,
-        );
-
         const buyOrSellData =
             tokenIn.address.toLowerCase() === tokenOut.address.toLowerCase()
                 ? { amountIn: expectedAmountOut, buyCallData: null }
                 : await this.buyOnDex(
                       tokenIn.address,
                       tokenOut.address,
-                      acceptableAmountOut,
+                      expectedAmountOut,
                       dexType,
                       receiver,
                       chainId,
@@ -349,22 +345,12 @@ export class ExchangeAggregatorService {
         dexType: Dex,
     ) {
         const erc4626Underlying = tokenOut.underlyingTokens[0];
-        const erc20AssetExpectedAmount =
-            await this.erc4626Service.convertToAssets(
-                chainId,
-                tokenOut.address,
-                expectedAmountOut,
-            );
+        const estimateAmountIn = await this.erc4626Service.convertToAssets(
+            chainId,
+            tokenOut.address,
+            expectedAmountOut,
+        );
         if (tokenIn.address.toLowerCase() === erc4626Underlying.toLowerCase()) {
-            const erc4626AcceptableAmount = getMaxDiscrepancyAmount(
-                BigInt(expectedAmountOut),
-                maxDiscrepancy,
-            );
-            const estimateAmountIn = await this.erc4626Service.convertToAssets(
-                chainId,
-                tokenOut.address,
-                erc4626AcceptableAmount,
-            );
             return {
                 tokenIn: tokenIn.address,
                 tokenOut: tokenOut.address,
@@ -373,14 +359,10 @@ export class ExchangeAggregatorService {
                 buyCallData: [],
             };
         } else {
-            const erc20AssetAcceptableAmount = getMaxDiscrepancyAmount(
-                BigInt(erc20AssetExpectedAmount),
-                maxDiscrepancy,
-            );
             const buyOrSellData = await this.buyOnDex(
                 tokenIn.address,
                 erc4626Underlying,
-                erc20AssetAcceptableAmount,
+                estimateAmountIn,
                 dexType,
                 receiver,
                 chainId,
@@ -407,50 +389,28 @@ export class ExchangeAggregatorService {
         dexType: Dex,
     ) {
         const erc4626Underlying = tokenIn.underlyingTokens[0];
-        const erc20AcceptableAmount = getMaxDiscrepancyAmount(
-            BigInt(expectedAmountOut),
+        const estimation = await this.estimateBuyERC20FromERC20(
+            { ...tokenIn, address: erc4626Underlying },
+            tokenOut,
+            expectedAmountOut,
+            receiver,
             maxDiscrepancy,
+            chainId,
+            dexType,
         );
-        if (
-            tokenOut.address.toLowerCase() === erc4626Underlying.toLowerCase()
-        ) {
-            const estimateAmountIn = await this.erc4626Service.convertToShares(
-                chainId,
-                tokenIn.address,
-                erc20AcceptableAmount,
-            );
-            return {
-                tokenIn: tokenIn.address,
-                tokenOut: tokenOut.address,
-                estimateAmountIn: BigInt(estimateAmountIn),
-                expectedAmountOut: expectedAmountOut,
-                buyCallData: [],
-            };
-        } else {
-            const buyOrSellData = await this.buyOnDex(
-                erc4626Underlying,
-                tokenOut.address,
-                erc20AcceptableAmount,
-                dexType,
-                receiver,
-                chainId,
-                maxDiscrepancy,
-            );
+        const estimateAmountIn = await this.erc4626Service.convertToShares(
+            chainId,
+            tokenIn.address,
+            estimation.estimateAmountIn,
+        );
 
-            const estimateAmountIn = await this.erc4626Service.convertToShares(
-                chainId,
-                tokenIn.address,
-                buyOrSellData.amountIn,
-            );
-
-            return {
-                tokenIn: tokenIn.address,
-                tokenOut: tokenOut.address,
-                estimateAmountIn: BigInt(estimateAmountIn),
-                expectedAmountOut: expectedAmountOut,
-                buyCallData: [buyOrSellData.buyCallData],
-            };
-        }
+        return {
+            tokenIn: tokenIn.address,
+            tokenOut: tokenOut.address,
+            estimateAmountIn: BigInt(estimateAmountIn),
+            expectedAmountOut: expectedAmountOut,
+            buyCallData: estimation.buyCallData,
+        };
     }
 
     async estimateBuyLPFromERC20(
@@ -476,17 +436,11 @@ export class ExchangeAggregatorService {
             maxDiscrepancy,
         );
         const lpToken0DesiredAmount =
-            (BigInt(expectedAmountOut) * BigInt(lpToken0Reserve)) /
+            (BigInt(lpAcceptableAmount) * BigInt(lpToken0Reserve)) /
             BigInt(lpTotalSupply);
         const lpToken1DesiredAmount =
-            (BigInt(expectedAmountOut) * BigInt(lpToken1Reserve)) /
+            (BigInt(lpAcceptableAmount) * BigInt(lpToken1Reserve)) /
             BigInt(lpTotalSupply);
-        console.log(`
-            Need ${lpToken0DesiredAmount} ${lpToken0Address}
-            And ${lpToken1DesiredAmount} ${lpToken1Address}
-            to add liquidate to get 
-            ${lpAcceptableAmount} LP token ${tokenOut.address}
-        `);
 
         const { buyData0: lpToken0BuyData, buyData1: lpToken1BuyData } =
             await this.estimateBuyOnDexLP(
@@ -533,14 +487,11 @@ export class ExchangeAggregatorService {
             lpToken1Address,
             lpToken1Reserve,
         } = await this.lpService.unwrapLP(chainId, tokenIn.address);
-        const erc20AcceptableAmount = getMaxDiscrepancyAmount(
-            BigInt(expectedAmountOut),
-            maxDiscrepancy,
+        const erc20EstimatedAmountForToken0 = getMaxDiscrepancyAmount(
+            BigInt(expectedAmountOut) / BigInt(2),
+            (Number(maxDiscrepancy) / 2).toString()
         );
-        const erc20EstimatedAmountForToken0 =
-            BigInt(erc20AcceptableAmount) / BigInt(2);
-        const erc20EstimatedAmountForToken1 =
-            BigInt(erc20AcceptableAmount) / BigInt(2);
+        const erc20EstimatedAmountForToken1 = erc20EstimatedAmountForToken0;
 
         const { sellData0: lpToken0SellData, sellData1: lpToken1SellData } =
             await this.estimateSellOnDexLP(

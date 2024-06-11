@@ -22,6 +22,7 @@ export class ParaswapService {
             chainId: number;
             account: string;
         },
+        maxDiscrepancy: string = '0.05',
     ) {
         const { data: priceData } = await this.httpService.axiosRef.get(
             `${this.baseUrl}/prices/`,
@@ -38,11 +39,12 @@ export class ParaswapService {
             },
         );
 
+        const slippage = Math.round(Number(maxDiscrepancy) * 10000);
         const txDataBody = {
             ...priceData,
             srcToken,
             destToken,
-            slippage: '5',
+            slippage,
             [side === 'BUY' ? `destAmount` : `srcAmount`]: amountTokenBN,
             userAddress: account,
         };
@@ -72,6 +74,7 @@ export class ParaswapService {
         amountOut: BigNumberish,
         receiver: string,
         chainId: string,
+        maxDiscrepancy: string,
     ) {
         const { data, amount } = await this.createCallDataParaswap(
             tokenIn,
@@ -84,6 +87,7 @@ export class ParaswapService {
                 chainId: Number(chainId),
                 account: receiver,
             },
+            maxDiscrepancy,
         );
 
         const amountIn = BigInt(amount);
@@ -102,6 +106,7 @@ export class ParaswapService {
         tokenOutDecimals: BigNumberish,
         receiver: string,
         chainId: string,
+        maxDiscrepancy: string,
     ) {
         const { data, amount } = await this.createCallDataParaswap(
             tokenIn,
@@ -114,6 +119,7 @@ export class ParaswapService {
                 chainId: Number(chainId),
                 account: receiver,
             },
+            maxDiscrepancy,
         );
 
         const amountOut = BigInt(amount);
