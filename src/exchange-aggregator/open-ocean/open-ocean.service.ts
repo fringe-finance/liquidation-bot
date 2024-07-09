@@ -49,11 +49,7 @@ export class OpenOceanService {
 
         if (priceData?.data?.data) {
             data = priceData.data.data;
-            amount = this.tryDecodeFuncData(
-                data,
-                OOE_ABI,
-                this.ifaceOpenOceanExchange,
-            );
+            amount = priceData.data.minAmountOut;
         }
         return {
             data,
