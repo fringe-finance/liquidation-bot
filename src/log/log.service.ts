@@ -4,53 +4,53 @@ import * as log4js from 'log4js';
 
 @Injectable()
 export class LogService {
-    constructor(private readonly configService: ConfigService) {
-        const logFolder = this.configService.get('LOG_DIR') || './logs';
-        log4js.configure({
-            appenders: {
-                common: {
-                    type: 'dateFile',
-                    filename: `${logFolder}/logs.log`,
-                    pattern: 'yyyy-MM-dd',
-                    compress: true,
-                    keepFileExt: true,
-                    numBackups: 15,
-                },
-            },
-            categories: { default: { appenders: ['common'], level: 'trace' } },
-        });
-    }
+  constructor(private readonly configService: ConfigService) {
+    const logFolder = this.configService.get('LOG_DIR') || './logs';
+    log4js.configure({
+      appenders: {
+        common: {
+          type: 'dateFile',
+          filename: `${logFolder}/logs.log`,
+          pattern: 'yyyy-MM-dd',
+          compress: true,
+          keepFileExt: true,
+          numBackups: 15,
+        },
+      },
+      categories: { default: { appenders: ['common'], level: 'trace' } },
+    });
+  }
 
-    log(message: any, ...args: any) {
-        const logger = log4js.getLogger("PLPv2");
-        if (args.length > 0) {
-            logger.log("info", message, args);
-            console.log(message, args);
-        } else {
-            logger.log(message);
-            console.log(message);
-        }
+  log(message: any, ...args: any) {
+    const logger = log4js.getLogger('PLPv2');
+    if (args.length > 0) {
+      logger.log('info', message, args);
+      console.log(message, args);
+    } else {
+      logger.log(message);
+      console.log(message);
     }
+  }
 
-    debug(message: any, ...args: any) {
-        const logger = log4js.getLogger("PLPv2");
-        if (args.length > 0) {
-            logger.debug("debug", message, args);
-            console.log(message, args);
-        } else {
-            logger.debug(message);
-            console.log(message);
-        }
+  debug(message: any, ...args: any) {
+    const logger = log4js.getLogger('PLPv2');
+    if (args.length > 0) {
+      logger.debug('debug', message, args);
+      console.log(message, args);
+    } else {
+      logger.debug(message);
+      console.log(message);
     }
+  }
 
-    error(message: any, ...args: any) {
-        const logger = log4js.getLogger("PLPv2");
-        if (args.length > 0) {
-            logger.error("error",message, args);
-            console.log(message, args);
-        } else {
-            logger.error(message);
-            console.log(message);
-        }
+  error(message: any, ...args: any) {
+    const logger = log4js.getLogger('PLPv2');
+    if (args.length > 0) {
+      logger.error('error', message, args);
+      console.log(message, args);
+    } else {
+      logger.error(message);
+      console.log(message);
     }
+  }
 }

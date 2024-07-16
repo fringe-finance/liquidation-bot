@@ -1,6 +1,5 @@
-
 export interface UpdatePriceData {
-    priceIds: string[],
-    updateData: string[],
-    updateFee: number
+  priceIds: string[];
+  updateData: string[];
+  updateFee: number;
 }

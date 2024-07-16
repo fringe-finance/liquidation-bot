@@ -6,19 +6,19 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-    imports: [
-        HttpModule,
-        ContractModule,
-        CacheModule.registerAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                ttl: Number(configService.get('CACHE_TTL')) || 300000,
-            }),
-            inject: [ConfigService],
-        }),
-    ],
-    controllers: [],
-    providers: [PriceTokenService],
-    exports: [PriceTokenService],
+  imports: [
+    HttpModule,
+    ContractModule,
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        ttl: Number(configService.get('CACHE_TTL')) || 300000,
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+  controllers: [],
+  providers: [PriceTokenService],
+  exports: [PriceTokenService],
 })
 export class PriceTokenModule {}

@@ -9,23 +9,23 @@ import { ERC4626ContractService } from './erc4626.service';
 import { LPContractService } from './lp.service';
 
 @Module({
-    imports: [LogModule, ProviderModule],
-    controllers: [],
-    providers: [
-        LiquidationContractService,
-        ERC20ContractService,
-        ERC4626ContractService,
-        LPContractService,
-        PriceAggregatorService,
-        PlpService,
-    ],
-    exports: [
-        LiquidationContractService,
-        ERC20ContractService,
-        ERC4626ContractService,
-        LPContractService,
-        PriceAggregatorService,
-        PlpService,
-    ],
+  imports: [LogModule, ProviderModule],
+  controllers: [],
+  providers: [
+    LiquidationContractService,
+    ERC20ContractService,
+    ERC4626ContractService,
+    LPContractService,
+    PriceAggregatorService,
+    PlpService,
+  ],
+  exports: [
+    LiquidationContractService,
+    ERC20ContractService,
+    ERC4626ContractService,
+    LPContractService,
+    PriceAggregatorService,
+    PlpService,
+  ],
 })
 export class ContractModule {}

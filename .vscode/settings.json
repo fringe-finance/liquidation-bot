@@ -1,4 +1,11 @@
 {
-  "editor.tabSize": 4,
-  "prettier.tabWidth": 4
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["typescript"],
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#521440",
+    "titleBar.activeBackground": "#731C5A",
+    "titleBar.activeForeground": "#FDF8FC"
+  }
 }

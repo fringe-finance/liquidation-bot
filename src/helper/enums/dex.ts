@@ -1,4 +1,4 @@
 export enum ExchangeType {
-    Paraswap,
-    OpenOcean
+  Paraswap,
+  OpenOcean,
 }

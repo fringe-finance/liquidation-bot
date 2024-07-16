@@ -5,18 +5,18 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-    imports: [
-        HttpModule,
-        CacheModule.registerAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                ttl: Number(configService.get('CACHE_TTL')) || 300000,
-            }),
-            inject: [ConfigService],
-        }),
-    ],
-    controllers: [],
-    providers: [GasPriceService],
-    exports: [GasPriceService],
+  imports: [
+    HttpModule,
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        ttl: Number(configService.get('CACHE_TTL')) || 300000,
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+  controllers: [],
+  providers: [GasPriceService],
+  exports: [GasPriceService],
 })
 export class GasPriceModule {}
