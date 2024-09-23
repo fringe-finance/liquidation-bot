@@ -5,27 +5,37 @@ import { ethers } from 'ethers';
 
 @Injectable()
 export abstract class BaseContractService {
-  protected readonly abi;
+    protected readonly abi;
 
-  constructor(protected readonly providerService, contractAbi: any) {
-    this.abi = contractAbi;
-  }
-
-  protected async getContractRead(networkId: number, contractAddress: string) {
-    const provider = await this.providerService.getProvider(networkId);
-    const contract = new ethers.Contract(contractAddress, this.abi, provider);
-    if (contract) {
-      return contract;
+    constructor(protected readonly providerService, contractAbi: any) {
+        this.abi = contractAbi;
     }
-    return null;
-  }
 
-  protected async getContractWrite(networkId: number, contractAddress: string) {
-    const signer = await this.providerService.getSigner(networkId);
-    const contract = new ethers.Contract(contractAddress, this.abi, signer);
-    if (contract) {
-      return contract;
+    protected async getContractRead(
+        networkId: number,
+        contractAddress: string,
+    ) {
+        const provider = await this.providerService.getProvider(networkId);
+        const contract = new ethers.Contract(
+            contractAddress,
+            this.abi,
+            provider,
+        );
+        if (contract) {
+            return contract;
+        }
+        return null;
     }
-    return null;
-  }
+
+    protected async getContractWrite(
+        networkId: number,
+        contractAddress: string,
+    ) {
+        const signer = await this.providerService.getSigner(networkId);
+        const contract = new ethers.Contract(contractAddress, this.abi, signer);
+        if (contract) {
+            return contract;
+        }
+        return null;
+    }
 }

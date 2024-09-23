@@ -1,4 +1,4 @@
 export interface ExpiredPriceFeed {
-  priceIds: string[];
-  updateFee: number;
+    priceIds: string[];
+    updateFee: number;
 }

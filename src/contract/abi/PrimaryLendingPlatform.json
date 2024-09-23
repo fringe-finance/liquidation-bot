@@ -1254,35 +1254,6 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "lendingToken",
-                "type": "address"
-            },
-            {
-                "internalType": "bytes32[]",
-                "name": "priceIds",
-                "type": "bytes32[]"
-            },
-            {
-                "internalType": "bytes[]",
-                "name": "updateData",
-                "type": "bytes[]"
-            }
-        ],
-        "name": "getTotalBorrowPerLendingTokenWithUpdatePrices",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "bytes32",
                 "name": "role",
                 "type": "bytes32"

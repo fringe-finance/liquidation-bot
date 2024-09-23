@@ -28,9 +28,9 @@ Rename the `.env.example` file to `.env` and update the value of env variables :
 | `TIME_BEFORE_EXPIRATION` | **REQUIRED** Time before expiration. Ex: 15s: `15`|
 | `PYTHNET_PRICE_FEED_ENDPOINT` | **REQUIRED** The endpoint to the PythNet price feed. Ex: `https://hermes.pyth.network`|
 | `CACHE_TTL` | Time to live the bot should store the price of native coin, to be used to measure the economic value of performing a liquidation. Defaults to `300000` millis |
-| `CRON_EXPRESSION` | **REQUIRED** How frequently the bot should use current account, price, and market index data to check for liquidatable accounts and, if necessary, commit any liquidations on-chain. Ex: 45s: `45 * * * * *` |
+| `CRON_EXPRESSION` | **REQUIRED** How frequently the bot should use current account, price, and market index data to check for liquidatable accounts and, if necessary, commit any liquidations on-chain. Ex: At 45s past the minute: `45 * * * * *` |
 | `ENABLE_CHECK_PROFIT` | If it should check have profit to liquidate. Default `true` |
-
+| `MAX_DISCREPANCY` | **REQUIRED** Specify the maximum allowed difference between the expected output amount and the actual output amount during the estimation process. It helps in handling slippage and ensuring that the estimated trade is within an acceptable range of deviation from the actual trade. The value should be a decimal number between 0 and 1. Example: 1 = 100%. The value should be smaller than `liquidatorRewardFactor - 1` of this position|
 
 Example for Polygon Mumbai testnet:
   ```
@@ -57,6 +57,8 @@ PYTHNET_PRICE_FEED_ENDPOINT=https://hermes.pyth.network
 CACHE_TTL = 300000 # optional default 5p=300000ms 
 CRON_EXPRESSION = "45 * * * * *"
 ENABLE_CHECK_PROFIT=true
+
+MAX_DISCREPANCY=0.1
   ```
 
 ### Step 2: Run liquidation bot 🚀

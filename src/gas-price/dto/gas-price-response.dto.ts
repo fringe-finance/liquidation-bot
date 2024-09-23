@@ -1,5 +1,5 @@
 export interface GasPriceResponse {
-  jsonrpc: string;
-  id: number;
-  result: string;
+    jsonrpc: string;
+    id: number;
+    result: string;
 }

@@ -28,19 +28,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newModerator",
-        "type": "address"
-      }
-    ],
-    "name": "GrantModeratorRole",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": false,
         "internalType": "uint8",
         "name": "version",
@@ -48,19 +35,6 @@
       }
     ],
     "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "moderator",
-        "type": "address"
-      }
-    ],
-    "name": "RevokeModeratorRole",
     "type": "event"
   },
   {
@@ -461,19 +435,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "newModerator",
-        "type": "address"
-      }
-    ],
-    "name": "grantModerator",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes32",
         "name": "role",
         "type": "bytes32"
@@ -579,19 +540,6 @@
       }
     ],
     "name": "renounceRole",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "moderator",
-        "type": "address"
-      }
-    ],
-    "name": "revokeModerator",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

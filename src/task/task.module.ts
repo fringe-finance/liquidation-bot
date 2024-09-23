@@ -8,14 +8,14 @@ import { PriceTokenModule } from 'src/price-token/price-token.module';
 import { ExchangeAggregatorModule } from 'src/exchange-aggregator/exchange-aggregator.module';
 
 @Module({
-  imports: [
-    LogModule,
-    ContractModule,
-    FringeModule,
-    GasPriceModule,
-    PriceTokenModule,
-    ExchangeAggregatorModule,
-  ],
-  providers: [LiquidateService],
+    imports: [
+        LogModule,
+        ContractModule,
+        FringeModule,
+        GasPriceModule,
+        PriceTokenModule,
+        ExchangeAggregatorModule,
+    ],
+    providers: [LiquidateService],
 })
 export class TaskModule {}

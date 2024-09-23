@@ -410,40 +410,6 @@
                 "internalType": "address",
                 "name": "_lendingToken",
                 "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_repayAmount",
-                "type": "uint256"
-            }
-        ],
-        "name": "getEstimatedProjectTokenReward",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "projectTokenReward",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_account",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_projectToken",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_lendingToken",
-                "type": "address"
             }
         ],
         "name": "getLiquidationAmount",
